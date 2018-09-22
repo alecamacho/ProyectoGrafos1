@@ -95,7 +95,7 @@ public class Nodo {
         
         double distance;
         
-        distance = Math.sqrt(Math.pow((nodo_1_x_coor - nodo_2_x_coor), 2) + Math.pow((nodo_1_x_coor - nodo_2_x_coor), 2)) ;
+        distance = Math.sqrt(Math.pow((nodo_1_x_coor - nodo_2_x_coor), 2) + Math.pow((nodo_1_y_coor - nodo_2_y_coor), 2)) ;
         
         return distance;
     }

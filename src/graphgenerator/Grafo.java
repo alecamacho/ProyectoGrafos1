@@ -170,7 +170,7 @@ public class Grafo {
         }
     }
     
-    public void Barabasi (int max_degree, boolean autociclos)
+    public void Barabasi (float max_degree, boolean autociclos)
     {
         int V;
         V = getNum_nodos(); // Asigna a V el numero de nodos
@@ -185,11 +185,12 @@ public class Grafo {
             {
                 if (i!=j)
                 {
-                    double probability;
+                    float probability;
                     probability = 1 - (this.getNodos().get(i).getGrado() / (float)max_degree);
+                    
                     //System.out.println(probability);
                     float random_number = rand.nextFloat();
-                    if (probability > random_number)
+                    if ((probability > random_number) && (this.getNodos().get(j).getGrado()<max_degree))
                     {
                         this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
                         this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName());
@@ -201,7 +202,7 @@ public class Grafo {
                  {
                     probability = 1 - (this.getNodos().get(i).getGrado() / (float)max_degree);
                     random_number = rand.nextFloat();
-                    if (probability > random_number)
+                    if (probability > random_number && (this.getNodos().get(j).getGrado()<max_degree))
                     {
                         this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
                         this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName());
