@@ -21,12 +21,12 @@ public class GraphGenerator {
         // TODO code application logic here
         
         Grafo g = new Grafo(500); //CREA UN OBJETO GRAFO
-        g.ErdosRenyi(20000, false);
-        //g.SimpleGeo((float) 0.25, false);
-        //g.Gilbert((float) 0.1 ,false);
-        //g.Barabasi(15, true);
+        //g.ErdosRenyi(20000, false);
+        //g.SimpleGeo((float) 0.3, false);
+        //g.Gilbert((float) 0.2 ,false);
+        g.Barabasi(20, true);
         
-        g.generarArchivo("erdos");
+        g.generarArchivo("Barabasi500_20");
         for (int i = 0; i < g.getNum_nodos(); i++)
         {
             System.out.println(Arrays.toString(g.getNodos().get(i).getConexiones())) ;
