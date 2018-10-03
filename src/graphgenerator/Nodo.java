@@ -19,6 +19,15 @@ public class Nodo {
     private int grado = 0;
     private float x_coor = 0;
     private float y_coor = 0;
+    private int visitado= 0;
+
+    public int getVisitado() {
+        return visitado;
+    }
+
+    public void setVisitado(int visitado) {
+        this.visitado = visitado;
+    }
     
     //CONSTRUCTOR
     public Nodo (int nombre, int L)

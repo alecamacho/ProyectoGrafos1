@@ -10,8 +10,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import static java.lang.Math.random;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -20,8 +25,6 @@ import java.util.stream.IntStream;
  * @author Alejandra
  */
 public class Grafo {
-
-
     private HashMap<Integer, Nodo> nodos = new HashMap<>();
     private int num_nodos;
     
@@ -42,6 +45,7 @@ public class Grafo {
         int[] options = IntStream.range(0, V).toArray(); //Array del 0 al numero de nodos
         //System.out.println(Arrays.toString(options));
         java.util.Random random = new java.util.Random(); // Crea objeto random
+        //random.setSeed(20);
         int k;
         k = 0;
         //COMIENZA A GENERAR LAS CONEXIONES DE LAS ARISTAS
@@ -268,7 +272,98 @@ public class Grafo {
         bw.write("}");
         bw.close();
     }
-
+    public Grafo BFS(int source){
+        int V = this.getNum_nodos();
+        LinkedList<Integer> siguiente = new LinkedList<>();
+        HashSet <Integer> visitado = new HashSet<>();
+        siguiente.add(source);
+        Grafo Bfs = new Grafo(V);
+        for (int i = 0; V>i ; i++)
+            {
+            Bfs.getNodos().put(i, new Nodo(i,V));// Agrega cada value , Nodo al hashmap
+            }
+        while (!siguiente.isEmpty()){
+            int actual=siguiente.remove();
+            if (!visitado.contains(actual)){
+                for (int i=0;i<this.getNodos().get(actual).getConexiones().length; i++){
+                    if (this.getNodos().get(actual).getConexiones()[i]==1){
+                        int hijo=i;
+                        if (!visitado.contains(hijo) && !siguiente.contains(hijo)){
+                            siguiente.add(hijo);
+                            Bfs.getNodos().get(actual).agregar_conexion(hijo);
+                            Bfs.getNodos().get(hijo).agregar_conexion(actual);
+                        }
+                            //System.out.println("hijos ");
+                    }
+                } 
+            visitado.add(actual);
+            }
+        }
+        return Bfs;
+    }
+    public Grafo DFS_I(int source){
+        int V = this.getNum_nodos();
+        Deque<Integer> siguiente = new ArrayDeque<>();
+        //LinkedList<Integer> siguiente = new LinkedList<>();
+        HashSet <Integer> visitado = new HashSet<>();
+        siguiente.push(source);
+        Grafo DFS_I = new Grafo(V);
+        for (int i = 0; V>i ; i++)
+            {
+            DFS_I.getNodos().put(i, new Nodo(i,V));// Agrega cada value , Nodo al hashmap
+            }
+        while (!siguiente.isEmpty()){
+            int actual=siguiente.pop();
+            if (!visitado.contains(actual)){
+                for (int i=0;i<this.getNodos().get(actual).getConexiones().length; i++){
+                    if (this.getNodos().get(actual).getConexiones()[i]==1){
+                        int hijo=i;
+                        if (!visitado.contains(hijo) && !siguiente.contains(hijo)){
+                            siguiente.push(hijo);
+                            DFS_I.getNodos().get(actual).agregar_conexion(hijo);
+                            DFS_I.getNodos().get(hijo).agregar_conexion(actual);
+                        }
+                            //System.out.println("hijos ");
+                    }
+                } 
+            visitado.add(actual);
+            }
+        }
+        return DFS_I;
+    }
+    public Grafo aux(){//Grafo salida para metodo recursivo
+       int V=this.getNum_nodos(); // Asigna a V el numero de nodos
+        Grafo aux = new Grafo(V);
+        for (int i = 0; V>i ; i++)
+            {
+            aux.getNodos().put(i, new Nodo(i,V));// Agrega cada value , Nodo al hashmap
+            }
+        return aux;
+    }
     
-}
+    public Grafo DFS_R(int source,Grafo Dfsr){
+            int hijo = 0;
+            System.out.println("Entre a DFS_R ");
 
+                
+                for (int i=0;i<this.getNodos().get(source).getConexiones().length; i++){
+                    
+                    if (this.getNodos().get(i).getVisitado()==0){
+                        this.getNodos().get(source).setVisitado(1);
+                        hijo = i;
+                        if (this.getNodos().get(source).getConexiones()[i]==1){
+                            hijo=i;
+                            System.out.print("Ahora defino el nuevo source ");
+                            System.out.println(hijo);
+                            Dfsr.getNodos().get(source).getConexiones()[hijo]=1;
+                            Dfsr.getNodos().get(hijo).getConexiones()[source]=1;
+                            
+                            DFS_R(hijo,Dfsr); 
+                    }
+                
+                }
+             
+            }
+        return Dfsr;
+    }
+}     
