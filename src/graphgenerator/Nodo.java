@@ -5,6 +5,7 @@
  */
 package graphgenerator;
 
+import static java.lang.Float.POSITIVE_INFINITY;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,14 +13,23 @@ import java.util.Random;
  *
  * @author Alejandra
  */
-public class Nodo {
+public class Nodo implements Comparable<Nodo> {
     
-    private int[] conexiones; 
+    private float[] conexiones; 
     private int name;
     private int grado = 0;
     private float x_coor = 0;
     private float y_coor = 0;
     private int visitado= 0;
+    private float peso_acum=POSITIVE_INFINITY;
+
+    public float getPeso_acum() {
+        return peso_acum;
+    }
+
+    public void setPeso_acum(float peso_acum) {
+        this.peso_acum = peso_acum;
+    }
 
     public int getVisitado() {
         return visitado;
@@ -33,20 +43,20 @@ public class Nodo {
     public Nodo (int nombre, int L)
     {
         this.name = nombre;
-        this.conexiones = new int[L];
+        this.conexiones = new float[L];
     }
     // METODOS  DEL ARRAY CONEXIONES
-    public int[] getConexiones() {
+    public float[] getConexiones() {
         return conexiones;
     }
 
-    public void setConexiones(int[] conexiones) {
+    public void setConexiones(float[] conexiones) {
         this.conexiones = conexiones;
     }
     
-    public void agregar_conexion(int nodo_id)
+    public void agregar_conexion(int nodo_id,float peso)
     {
-        conexiones[nodo_id] = 1;
+        conexiones[nodo_id] = peso;
     }
 
     //METODOS DEL ATRIBUTO NOMBRE
@@ -109,6 +119,21 @@ public class Nodo {
         return distance;
     }
 
-       
-    
+    @Override
+    public int compareTo(Nodo o) {
+        if (this.getPeso_acum()>o.getPeso_acum()){
+            //System.out.println("1");
+            return 1;
+            
+        }
+        else if(this.getPeso_acum()<o.getPeso_acum()){
+           // System.out.println("-1");
+            return -1;
+            
+        }
+        else{
+            //System.out.println("0");
+            return 0;
+        }
+    }
 }

@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import static java.lang.Math.random;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -33,7 +35,7 @@ public class Grafo {
         this.num_nodos = a;
     }
     
-    public void ErdosRenyi (int aristas_creadas, boolean autociclos)
+    public void ErdosRenyi (int aristas_creadas, boolean autociclos,float max, float min)
     {
         int V;
         V = getNum_nodos(); // Asigna a V el numero de nodos
@@ -63,21 +65,27 @@ public class Grafo {
                 //SI SE ELIGEN LOS MISMOS NODOS, LOS CONECTA SOLO SI SE ACEPTAN LOS AUTOCICLOS
                 if (index_option1 != index_option2)
                 {
-                    this.getNodos().get(index_option1).agregar_conexion(index_option2);
-                    this.getNodos().get(index_option2).agregar_conexion(index_option1);
+                    Arista edge= new Arista(k,max,min);
+                    this.getNodos().get(index_option1).agregar_conexion(index_option2,edge.getPeso());
+                    this.getNodos().get(index_option2).agregar_conexion(index_option1,edge.getPeso());
+                    edge.setOrigen(index_option1);
+                    edge.setDestino(index_option2);
                     k = k+1;
                 }
                 else if ( autociclos == true)
                 {
-                    this.getNodos().get(index_option1).agregar_conexion(index_option2);
-                    this.getNodos().get(index_option2).agregar_conexion(index_option1);
+                    Arista edge= new Arista(k,max,min);
+                    this.getNodos().get(index_option1).agregar_conexion(index_option2,edge.getPeso());
+                    this.getNodos().get(index_option2).agregar_conexion(index_option1,edge.getPeso());
+                    edge.setOrigen(index_option1);
+                    edge.setDestino(index_option2);
                     k = k+1;                   
                 }
-            }
+            
         }
     }
-    
-    public void Gilbert(float probability, boolean autociclos)
+    }
+    public void Gilbert(float probability, boolean autociclos, float max, float min)
     {
         int V;
         V = getNum_nodos(); // Asigna a V el numero de nodos
@@ -102,10 +110,13 @@ public class Grafo {
                 {
                     if (random_number < probability)
                     {
-                        if (this.getNodos().get(i).getConexiones()[j] != 1)
+                        if (this.getNodos().get(i).getConexiones()[j] == 0)
                         {
-                            this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
-                            this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName()); 
+                            Arista edge= new Arista(contador,max,min);
+                            this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName(),edge.getPeso());
+                            this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName(),edge.getPeso());
+                            edge.setOrigen(i);
+                            edge.setDestino(j);
                             contador = contador +1 ;
                         }
                     }                    
@@ -117,8 +128,11 @@ public class Grafo {
                     {
                         if (this.getNodos().get(i).getConexiones()[j] != 1)
                         {
-                            this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
-                            this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName());  
+                            Arista edge= new Arista(contador,max,min);
+                            this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName(),edge.getPeso());
+                            this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName(),edge.getPeso());
+                            edge.setOrigen(i);
+                            edge.setDestino(j);
                             contador =contador +1 ;
                         }
                     }
@@ -131,7 +145,7 @@ public class Grafo {
         //System.out.println(contador);
     }
     
-    public void SimpleGeo(float threshold, boolean autociclos)
+    public void SimpleGeo(float threshold, boolean autociclos, float max, float min)
     {
         int V;
         V = getNum_nodos(); // Asigna a V el numero de nodos
@@ -140,7 +154,7 @@ public class Grafo {
             this.getNodos().put(i, new Nodo(i,V));// Agrega cada value , Nodo al hashmap
             this.getNodos().get(i).generare_random_coords(); //Genera las coordenadas (x,y) aleatorias para el nodo i
         }
-        
+        int contador=0;
         for (int i=0 ; i < this.getNum_nodos(); i++)
         {
             for  (int j = 0; j < this.getNum_nodos(); j++)
@@ -153,10 +167,11 @@ public class Grafo {
                     
                     if (distance < threshold)
                     {
-                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
-                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName());                     
+                        Arista edge= new Arista(contador,max,min);
+                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName(),edge.getPeso());
+                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName(),edge.getPeso());                     
                     }
-
+                    contador++;
                 }
                 else if (autociclos == true)
                 {
@@ -165,18 +180,21 @@ public class Grafo {
                     
                     if (distance < threshold)
                     {
-                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
-                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName());                     
-                    }                   
+                        Arista edge= new Arista(contador,max,min);
+                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName(),edge.getPeso());
+                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName(),edge.getPeso());                     
+                    } 
+                    contador++;
                 }
                 
             }
         }
     }
     
-    public void Barabasi (float max_degree, boolean autociclos)
+    public void Barabasi (float max_degree, boolean autociclos, float max,float min)
     {
         int V;
+        int contador=0;
         V = getNum_nodos(); // Asigna a V el numero de nodos
         for (int i = 0; V>i ; i++)
         {
@@ -196,10 +214,14 @@ public class Grafo {
                     float random_number = rand.nextFloat();
                     if ((probability > random_number) && (this.getNodos().get(j).getGrado()<max_degree))
                     {
-                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
-                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName());
+                        Arista edge= new Arista(contador,max,min);
+                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName(),edge.getPeso());
+                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName(),edge.getPeso());
                         this.getNodos().get(i).increaseGrado();
                         this.getNodos().get(j).increaseGrado();
+                        edge.setOrigen(i);
+                        edge.setDestino(j);
+                        contador++;
                         
                     }
                  else if (autociclos == true)
@@ -208,10 +230,14 @@ public class Grafo {
                     random_number = rand.nextFloat();
                     if (probability > random_number && (this.getNodos().get(j).getGrado()<max_degree))
                     {
-                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName());
-                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName());
+                        Arista edge= new Arista(contador,max,min);
+                        this.getNodos().get(i).agregar_conexion(this.getNodos().get(j).getName(),edge.getPeso());
+                        this.getNodos().get(j).agregar_conexion(this.getNodos().get(i).getName(),edge.getPeso());
                         this.getNodos().get(i).increaseGrado();
                         this.getNodos().get(j).increaseGrado();
+                        edge.setOrigen(i);
+                        edge.setDestino(j);
+                        contador++;
                     }                     
                  }
                 }
@@ -258,14 +284,15 @@ public class Grafo {
         bw.write("graph {"+"\r\n");
         int V = this.getNum_nodos();
         for(i = 0; i < V; i++) {
-            bw.write("\""+(i)+"\";\r\n");
+            bw.write("\""+(i)+"\" [label=\"N" + (i) +"(" +  this.getNodos().get(i).getPeso_acum() + ")\"];\r\n");
         }
         for(i = 0; i < V; i++) {
             k++;
             for(j = 0; j < k; j++) {
                     
-                if (this.getNodos().get(i).getConexiones()[j] == 1){
-                    bw.write("\""+(i)+"\"--\""+(j)+"\";"+"\r\n"); 
+                if (this.getNodos().get(i).getConexiones()[j] != 0){
+                    float peso = this.getNodos().get(i).getConexiones()[j];
+                    bw.write("\"" + (i) + "\"--\""+(j)+"\" [weight= " + peso + "];"  +  "\r\n"); 
                 }
             }
         }
@@ -286,12 +313,12 @@ public class Grafo {
             int actual=siguiente.remove();
             if (!visitado.contains(actual)){
                 for (int i=0;i<this.getNodos().get(actual).getConexiones().length; i++){
-                    if (this.getNodos().get(actual).getConexiones()[i]==1){
+                    if (this.getNodos().get(actual).getConexiones()[i]!=0){
                         int hijo=i;
                         if (!visitado.contains(hijo) && !siguiente.contains(hijo)){
                             siguiente.add(hijo);
-                            Bfs.getNodos().get(actual).agregar_conexion(hijo);
-                            Bfs.getNodos().get(hijo).agregar_conexion(actual);
+                            Bfs.getNodos().get(actual).agregar_conexion(hijo,this.getNodos().get(actual).getConexiones()[i]);
+                            Bfs.getNodos().get(hijo).agregar_conexion(actual,this.getNodos().get(actual).getConexiones()[i]);
                         }
                             //System.out.println("hijos ");
                     }
@@ -320,8 +347,8 @@ public class Grafo {
                         int hijo=i;
                         if (!visitado.contains(hijo) && !siguiente.contains(hijo)){
                             siguiente.push(hijo);
-                            DFS_I.getNodos().get(actual).agregar_conexion(hijo);
-                            DFS_I.getNodos().get(hijo).agregar_conexion(actual);
+                            DFS_I.getNodos().get(actual).agregar_conexion(hijo,this.getNodos().get(actual).getConexiones()[i]);
+                            DFS_I.getNodos().get(hijo).agregar_conexion(actual,this.getNodos().get(actual).getConexiones()[i]);
                         }
                             //System.out.println("hijos ");
                     }
@@ -355,8 +382,8 @@ public class Grafo {
                             hijo=i;
                             System.out.print("Ahora defino el nuevo source ");
                             System.out.println(hijo);
-                            Dfsr.getNodos().get(source).getConexiones()[hijo]=1;
-                            Dfsr.getNodos().get(hijo).getConexiones()[source]=1;
+                            Dfsr.getNodos().get(source).getConexiones()[hijo]=this.getNodos().get(source).getConexiones()[hijo];
+                            Dfsr.getNodos().get(hijo).getConexiones()[source]=this.getNodos().get(source).getConexiones()[hijo];
                             
                             DFS_R(hijo,Dfsr); 
                     }
@@ -366,4 +393,61 @@ public class Grafo {
             }
         return Dfsr;
     }
+    public Grafo Dijkstra(int s){
+        
+        
+        Nodo source=this.getNodos().get(s);
+        source.setPeso_acum(0);
+        int V=this.getNum_nodos();
+        PriorityQueue<Nodo> PQ = new PriorityQueue<>();
+        
+        //Crea el objeto grafo para el arbol de Dijkstra
+        
+        Grafo dijkstra= new Grafo(V);
+        int[] ancestro = new int[V];
+        ancestro[source.getName()]=source.getName();//ancestro[hijo]=padre
+        for (int j=0;j<V;j++){
+            PQ.add(this.getNodos().get(j));
+            dijkstra.getNodos().put(j, new Nodo(j,V));// Agrega cada value , Nodo al hashmap
+            //System.out.println(dijkstra.getNodos().get(j).getConexiones()[0]);
+  
+        }
+        while(!PQ.isEmpty()){
+            int padre=PQ.remove().getName();
+            int num_con=this.getNodos().get(padre).getConexiones().length;
+            for (int hijo=0;hijo<num_con; hijo++){
+                float peso_arista=this.getNodos().get(padre).getConexiones()[hijo];
+                
+                if (peso_arista !=0) {
+                    float distancia=peso_arista+this.getNodos().get(padre).getPeso_acum();
+                    if (distancia<this.getNodos().get(hijo).getPeso_acum()){
+                        this.getNodos().get(hijo).setPeso_acum(distancia);         
+                        //if(this.getNodos().get(padre).getConexiones()[hijo]!=0){
+                        ancestro[hijo]=padre;
+                    //}
+                    }
+                }
+            }
+        }
+        System.out.println("ancestro");
+
+        System.out.println(Arrays.toString(ancestro));
+        
+        for(int a=0;a<V;a++){//i=hijo
+            //if(s!=i){
+                float peso= this.getNodos().get(ancestro[a]).getConexiones()[a];
+                System.out.print("PESO:  "+peso);
+                dijkstra.getNodos().get(a).agregar_conexion(ancestro[a],peso);
+                System.out.print(" Conexion?  "+dijkstra.getNodos().get(a).getConexiones()[ancestro[a]]);
+                dijkstra.getNodos().get(ancestro[a]).agregar_conexion(a,peso);
+                System.out.println("  conexion?  "+dijkstra.getNodos().get(ancestro[a]).getConexiones()[a]);
+                dijkstra.getNodos().get(a).setPeso_acum(this.getNodos().get(a).getPeso_acum());
+            }
+       // }
+       
+      return dijkstra;  
+    }
+            
+    
+    
 }     
